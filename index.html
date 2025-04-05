@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>抓星星遊戲 ⭐</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: white;
+      text-align: center;
+      font-family: sans-serif;
+    }
+    canvas {
+      background: black;
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>抓星星遊戲 ⭐</h1>
+  <canvas id="gameCanvas" width="600" height="800"></canvas>
+  <p>使用左右鍵移動</p>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const player = {
+      x: 275,
+      y: 740,
+      width: 50,
+      height: 50,
+      speed: 8,
+      color: "blue"
+    };
+
+    const starImg = new Image();
+    starImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Five-pointed_star.svg/1024px-Five-pointed_star.svg.png";
+
+    let star = {
+      x: Math.random() * 550,
+      y: 0,
+      size: 40,
+      speed: 5
+    };
+
+    let score = 0;
+    let keys = {};
+
+    document.addEventListener("keydown", e => keys[e.key] = true);
+    document.addEventListener("keyup", e => keys[e.key] = false);
+
+    function drawPlayer() {
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function drawStar() {
+      ctx.drawImage(starImg, star.x, star.y, star.size, star.size);
+    }
+
+    function update() {
+      if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
+      if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
+
+      star.y += star.speed;
+      if (star.y > canvas.height) {
+        star.y = 0;
+        star.x = Math.random() * (canvas.width - star.size);
+      }
+
+      if (
+        star.x < player.x + player.width &&
+        star.x + star.size > player.x &&
+        star.y < player.y + player.height &&
+        star.y + star.size > player.y
+      ) {
+        score++;
+        star.y = 0;
+        star.x = Math.random() * (canvas.width - star.size);
+      }
+    }
+
+    function drawScore() {
+      ctx.fillStyle = "white";
+      ctx.font = "24px Arial";
+      ctx.fillText("Score: " + score, 10, 30);
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPlayer();
+      drawStar();
+      update();
+      drawScore();
+      requestAnimationFrame(gameLoop);
+    }
+
+    starImg.onload = () => {
+      gameLoop();
+    };
+  </script>
+</body>
+</html>
+ 
